@@ -6,9 +6,10 @@ public class GameManager : MonoBehaviour {
 
     public GameObject AlliesText;
     public GameObject AxisText;
+    public GameObject StartPage;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         gameIsOver = false;
 	}
 	
@@ -23,5 +24,9 @@ public class GameManager : MonoBehaviour {
 
     public void AxisWin() {
         AxisText.SetActive(true);
+    }
+
+    public void GameStart() {
+        StartPage.SetActive(false);
     }
 }

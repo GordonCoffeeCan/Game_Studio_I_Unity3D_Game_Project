@@ -22,7 +22,7 @@ public class TankController : MonoBehaviour {
     private Rigidbody _rigidbody;
     private Transform cannonBallSpawn;
 
-    private AudioSource tankAudio;
+    private AudioSource fireAudio;
 
     private float fireForce;
     private float fireAccumulateForce = 2.5f;
@@ -39,7 +39,7 @@ public class TankController : MonoBehaviour {
 	void Start () {
 		myTank = this.transform;
         _rigidbody = this.GetComponent<Rigidbody>();
-        tankAudio = this.GetComponent<AudioSource>();
+        fireAudio = this.transform.FindChild("CannonBallSpawn").GetComponent<AudioSource>();
 
         cannonBallSpawn = transform.FindChild("CannonBallSpawn");
 
@@ -54,6 +54,10 @@ public class TankController : MonoBehaviour {
 	}
 
     void Update() {
+        if (Input.anyKeyDown) {
+            GameObject.Find("GameManager").GetComponent<GameManager>().GameStart();
+        }
+
         if (GameManager.gameIsOver == true) {
             if (Input.GetKeyDown(KeyCode.Space)) {
                 SceneManager.LoadScene("Main", LoadSceneMode.Single);
@@ -104,16 +108,18 @@ public class TankController : MonoBehaviour {
         if (isHit == false) {
             float v = Input.GetAxis("VerticalControl" + tankNum);
             float h = Input.GetAxis("HorizontalControl" + tankNum);
-            _rigidbody.velocity = myTank.forward * v * speed;
+            _rigidbody.velocity = new Vector3(myTank.forward.x * v * speed, _rigidbody.velocity.y, myTank.forward.z * v * speed);
             _rigidbody.angularVelocity = myTank.up * h * angularSpeed;
         }
 	}
 
     private void InstantiateCannonShell() {
         Rigidbody _cannonShell;
-        tankAudio.Play();
+        fireAudio.Play();
         _cannonShell = Instantiate(cannonShell, cannonBallSpawn.position, cannonBallSpawn.transform.rotation) as Rigidbody;
         _cannonShell.AddForce(_cannonShell.transform.forward * fireForce, ForceMode.Impulse);
+
+        Physics.IgnoreCollision(_cannonShell.GetComponent<Collider>(), this.GetComponent<Collider>(), true);
     }
 
     private void DestroyTank() {
